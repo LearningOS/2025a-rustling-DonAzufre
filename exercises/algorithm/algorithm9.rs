@@ -1,11 +1,12 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
-use std::cmp::Ord;
+use std::cmp::{Ord, Ordering};
 use std::default::Default;
+
+fn main() {}
 
 pub struct Heap<T>
 where
@@ -38,6 +39,36 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.count += 1;
+        self.items.push(value);
+
+        let mut curr_idx = self.count;
+        while curr_idx != 1 {
+            let par_idx = self.smallest_child_idx(self.parent_idx(curr_idx)) * 2 - 1;
+            // let par_idx = self.parent_idx(curr_idx);
+
+            if (self.comparator)(&self.items[par_idx], &self.items[curr_idx]) {
+                self.items.swap(par_idx, curr_idx);
+            }
+            
+            let lower_bound = self.smallest_child_idx(curr_idx);
+            let upper_bound = self.count.min(lower_bound * 2 - 1);
+
+            eprintln!("lb: {}, ub: {}, ci: {}, pi: {}, ct: {}", lower_bound, upper_bound, curr_idx, par_idx, self.count);
+            
+            self.items[lower_bound..=upper_bound].sort_by(|a, b| {
+                if !(self.comparator)(a, b) {
+                    Ordering::Less
+                } else {
+                    Ordering::Greater
+                }
+            });
+
+
+            curr_idx = par_idx;
+        }
+
+
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +89,7 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        (0usize..).map(|a| 2usize.pow(a as u32)).skip_while(|&a| !(a <= idx && 2*a > idx)).nth(0).unwrap()
     }
 }
 
@@ -85,7 +116,13 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        match self.count {
+            0 => None,
+            _ => {
+                self.count -= 1;
+                self.items.pop()
+            }
+        }
     }
 }
 
